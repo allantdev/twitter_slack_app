@@ -136,3 +136,4 @@ dmypy.json
 
 # my stuff
 .notes
+.DS_Store
