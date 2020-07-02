@@ -11,7 +11,9 @@
 import os
 import requests
 import json
-import time
+from time import sleep
+import logging
+import logging.handlers
 from pprint import pprint
 from requests.auth import AuthBase
 from requests.auth import HTTPBasicAuth
@@ -60,10 +62,9 @@ class BearerTokenAuth(AuthBase):
 # Send Notification to Slack
 def notify_slack(text):    
     url = EnvKeys.slack_url
-    print(url)
     payload = {"text": text}
     r = requests.post(url, data=json.dumps(payload))
-    print(r.text)
+    return(r.status_code)
 
 def get_all_rules(rules_url, auth):
   
@@ -122,18 +123,10 @@ def response_process(data):
         # Build Tweet URL
         tweet_url = "https://twitter.com/{}/status/{}".format(twitter_uname, tweet_id)
         slack_response = notify_slack(tweet_url)
-        return tweet_url
+        url_status = "{}, {}".format(tweet_url, slack_response)
+        return url_status
     else:
         return "Nothing to see here waiting for the next tweet"
-
-    
-def stream_connect(auth):
-  stream_url = "https://api.twitter.com/labs/1/tweets/stream/filter"
-  response = requests.get(stream_url, auth=auth, stream=True)
-  for response_line in response.iter_lines():
-    if response_line:
-        tweet_content = response_process(response_line)
-        pprint(tweet_content)
 
 def setup_rules(auth):
   rules_url = "https://api.twitter.com/labs/1/tweets/stream/filter/rules"
@@ -143,6 +136,14 @@ def setup_rules(auth):
   current_rules = get_all_rules(rules_url, auth)
   delete_all_rules(current_rules, rules_url, auth)
   set_rules(filter_rules, rules_url, auth)
+
+def stream_connect(auth):
+  stream_url = "https://api.twitter.com/labs/1/tweets/stream/filter"
+  response = requests.get(stream_url, auth=auth, stream=True)
+  for response_line in response.iter_lines():
+    if response_line:
+        tweet_content = response_process(response_line)
+        pprint(tweet_content)
 
 def main():
     
@@ -159,7 +160,9 @@ def main():
     # will increase if the client cannot reconnect to the stream.
     timeout = 0
     while True:
+        pprint("Starting twitter stream reader. Printed URLs are posted to Slack")
         stream_connect(bearer_token)
+        pprint("Stream reader stopped, backing off and retrying connection")
         sleep(2 ** timeout)
         timeout += 1
 
