@@ -1,8 +1,21 @@
+This was a demo made for a prospective employer. It was made as an engineering exercise.
+There are probably better solutions to achieve the same goal.
+
+# Prior to setup Instructions:
+Create Twitter account
+Gain Dev Access
+Save API creds
+Get Slack account
+Activate Webhooks
+Integrate Twitter Slack Connector. Dont watch a user
+
 # twitter_slack_app
-Pizza Demos
+
 
 # Setup on macOS
-Install Homebrew
+Open Terminal
+
+Install Homebrew from their site
 
 Install pyenv: 
 brew install pyenv
@@ -19,7 +32,9 @@ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nf
 Install pipenv:
 pip install -U pipenv
 
-cd to the project directory
+Create your Pizza Demos Folder
+
+cd to the folder
 
 create your creds and variables in a .env file at the root
 
@@ -28,3 +43,12 @@ pipenv install
 
 to start the bot run:
 pipenv run python main.py
+
+# Your credentials for your own twitter and slack connector
+
+Make a file named .env and put your creds in it in the base folder
+
+CLIENT_KEY = "Twitter Customer Key"
+CLIENT_SECRET = "Twitter Customer Secret"
+SLACK_URL = "Slack webhook url for your app"
+TWITTER_USER = "Twitter User you would like to follow"
